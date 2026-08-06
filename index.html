@@ -66,7 +66,7 @@ html[data-theme="light"]{
   --map-stroke-active:#1A1A1A;
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
+html,body{overflow: hidden;margin:0;padding:0}
 body{
   background:var(--paper);
   color:var(--ink);
@@ -81,7 +81,7 @@ body{
   display:grid;
   grid-template-columns: minmax(420px, 1.6fr) minmax(360px, 1fr);
   gap:0;
-  min-height:100vh;
+  min-height:0vh;
 }
 @media (max-width: 940px){
   .wrap{grid-template-columns:1fr}
@@ -89,7 +89,7 @@ body{
 
 /* ---------- Map column ---------- */
 .map-col{
-  padding:0 20px 40px;
+  padding:0 20px 10px;
   position:relative;
   background:var(--map-bg);
   transition:background .3s ease, border-color .3s ease;
@@ -105,9 +105,9 @@ body{
 .map-heading p{margin:0;color:var(--muted);font-size:.92rem;line-height:1.5;max-width:52ch}
 
 .map-shell{
-  width:min(1012px, calc((100vh - 90px) * 0.8803));
+  width:min(1012px, calc((100vh - 90px) * 1.1));
+  margin: -150px auto 0;
   max-width:100%;
-  margin:0 auto 0;
   position:relative;
   perspective:1400px;
   padding:6px 10px 10px;
@@ -299,7 +299,7 @@ footer.foot a{color:var(--teal-light)}
 .feedback-status{font-size:.8rem;color:var(--muted)}
 .feedback-status.ok{color:#2FA83F}
 .feedback-confirm{
-  font-family:'Spectral',serif;font-size:1.15rem;color:#2FA83F;
+  font-family:'Spectral',serif;font-size:1.15rem;color:#696868;
   margin:0;padding:18px 0;text-align:center;
   animation:pathIn .4s ease forwards;
 }
@@ -425,22 +425,9 @@ footer.foot a{color:var(--teal-light)}
      layout could otherwise make them look like content, so it's
      safest to keep some form of label).
 ============================================================ -->
-<div class="ad-slot ad-slot-footer">
-  <span class="ad-tag">Advertisement</span>
-  <!--
-  <ins class="adsbygoogle"
-       style="display:block;width:100%"
-       data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-       data-ad-slot="XXXXXXXXXX"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  -->
-</div>
-
 <footer class="foot">
   <span>Boundaries are simplified for illustration and not authoritative for legal or administrative use.</span>
-  <span><a href="#" id="feedbackLink">Feedback</a> · <a href="privacy.html">Privacy Policy</a> · <a href="ads.txt">ads.txt</a> · <a href="#" id="reopenConsent">Cookie Settings</a></span>
+  <span><a href="#" id="feedbackLink">Feedback</a> · <a href="privacy.html">Privacy Policy</a> · <a href="#" id="reopenConsent">Cookie Settings</a></span>
 </footer>
 
 <!-- ============================================================
@@ -585,17 +572,7 @@ function selectState(id, skipHash){
 // 3. Uncomment the <ins>/<script> block.
 // ============================================================
 const AD_SLOT_PANEL_HTML = `
-  <div class="ad-slot ad-slot-panel">
-    <span class="ad-tag">Advertisement</span>
-    <!--
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-         data-ad-slot="XXXXXXXXXX"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>
-    -->
+  <div>
   </div>
 `;
 
@@ -661,12 +638,6 @@ function renderDefault(){
   const any = STATES[ids[0]];
   col.innerHTML = `
     <div class="state-panel">
-      <div class="state-images">
-        <div class="medallion" style="background:var(--paper-dim)">
-          <div class="ring"></div>
-          <span style="font-size:1.8rem">🇮🇳</span>
-        </div>
-      </div>
       <h2 class="state-name">Pan-India Services</h2>
 
       <div class="section-label">Citizen ID &amp; Documents</div>
@@ -825,7 +796,7 @@ document.getElementById('reopenConsent').addEventListener('click', (e)=>{
 // visible to you, in real time, from every visitor.
 // ============================================================
 const FEEDBACK_KEY = 'feedbackEntries';
-const FEEDBACK_ENDPOINT = null; // <-- paste your Apps Script Web App URL here, e.g. 'https://script.google.com/macros/s/AKfycb.../exec'
+const FEEDBACK_ENDPOINT = null; //'https://script.google.com/macros/s/AKfycbwv3c5sdOdF8V2W2U1qjadyfnGWAxC6e_AX8RmdTw2T37O3OY-ugX7AvCHE51Dy0MM13g/exec'; // <-- paste your Apps Script Web App URL here, e.g. 'https://script.google.com/macros/s/AKfycb.../exec'
 
 function getFeedbackEntries(){
   try{ return JSON.parse(localStorage.getItem(FEEDBACK_KEY)) || []; }
@@ -833,16 +804,6 @@ function getFeedbackEntries(){
 }
 function saveFeedbackEntries(list){
   localStorage.setItem(FEEDBACK_KEY, JSON.stringify(list));
-}
-function downloadFeedbackWorkbook(){
-  const entries = getFeedbackEntries();
-  if(!entries.length || typeof XLSX === 'undefined') return;
-  const rows = entries.map(en => ({ Date: en.date, Name: en.name, Message: en.message }));
-  const ws = XLSX.utils.json_to_sheet(rows, {header:['Date','Name','Message']});
-  ws['!cols'] = [{wch:20},{wch:22},{wch:60}];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Feedback');
-  XLSX.writeFile(wb, 'Feedback.xlsx');
 }
 
 function closeFeedbackForm(){
@@ -888,8 +849,7 @@ function openFeedbackForm(){
     const entries = getFeedbackEntries();
     entries.push(entry);
     saveFeedbackEntries(entries);
-    downloadFeedbackWorkbook(); // re-downloads Feedback.xlsx with this entry appended
-
+    
     if(FEEDBACK_ENDPOINT){
       try{
         // Sent as form-encoded (not JSON) and without custom headers so this
