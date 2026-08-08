@@ -81,7 +81,7 @@ body{
   display:grid;
   grid-template-columns: minmax(420px, 1.6fr) minmax(360px, 1fr);
   gap:0;
-  min-height:0vh;
+  min-height:100vh;
 }
 @media (max-width: 940px){
   .wrap{grid-template-columns:1fr}
@@ -105,8 +105,8 @@ body{
 .map-heading p{margin:0;color:var(--muted);font-size:.92rem;line-height:1.5;max-width:52ch}
 
 .map-shell{
-  width:min(1012px, calc((100vh - 90px) * 1.1));
-  margin: -150px auto 0;
+  width:min(1113px, calc((100vh - 90px) * 0.8803));
+  margin:0 auto 0;
   max-width:100%;
   position:relative;
   perspective:1400px;
@@ -252,9 +252,19 @@ svg#india path.active{animation:pathIn .5s ease forwards, stampIn .35s ease-out}
 
 footer.foot{
   padding:22px 32px 40px;border-top:2px solid var(--ink);font-size:.78rem;color:var(--muted);
-  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
 }
 footer.foot a{color:var(--teal-light)}
+.footer-icons{display:flex;align-items:center;gap:8px}
+.footer-icon{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--white);border:1.5px solid var(--line);
+  font-size:1rem;text-decoration:none;cursor:pointer;
+  transition:background .15s ease, transform .15s ease, border-color .15s ease;
+}
+.footer-icon:hover{background:var(--paper-dim);border-color:var(--ink);transform:translateY(-2px)}
+.footer-icon.active{border-color:var(--seal);background:var(--paper-dim)}
 
 /* ---------- Ad slots (Google AdSense) ---------- */
 .ad-slot{
@@ -278,6 +288,10 @@ footer.foot a{color:var(--teal-light)}
 }
 .feedback-note{font-size:.9rem;color:var(--muted);margin:0 0 16px;line-height:1.5}
 .feedback-note.small{font-size:.76rem;margin-top:10px}
+.info-panel-body p{margin:0 0 12px}
+.info-panel-body p:last-child{margin-bottom:0}
+.info-panel-body a{color:var(--seal)}
+.info-panel-body code{font-family:'IBM Plex Mono',monospace;font-size:.85em;background:var(--paper-dim);padding:1px 5px;border-radius:4px}
 .feedback-form{display:flex;flex-direction:column;gap:10px}
 .feedback-form input,
 .feedback-form textarea{
@@ -427,7 +441,11 @@ footer.foot a{color:var(--teal-light)}
 ============================================================ -->
 <footer class="foot">
   <span>Boundaries are simplified for illustration and not authoritative for legal or administrative use.</span>
-  <span><a href="#" id="feedbackLink">Feedback</a> · <a href="privacy.html">Privacy Policy</a> · <a href="#" id="reopenConsent">Cookie Settings</a></span>
+  <span class="footer-icons">
+    <a href="#" id="feedbackLink" class="footer-icon" title="Feedback" aria-label="Feedback">💬</a>
+    <a href="#" id="privacyLink" class="footer-icon" title="Privacy Policy" aria-label="Privacy Policy">🔒</a>
+    <a href="#" id="cookiesLink" class="footer-icon" title="Cookies" aria-label="Cookies">🍪</a>
+  </span>
 </footer>
 
 <!-- ============================================================
@@ -768,10 +786,6 @@ document.getElementById('cookieDecline').addEventListener('click', (e)=>{
   localStorage.setItem(CONSENT_KEY, 'declined');
   hideCookieNotice();
 });
-document.getElementById('reopenConsent').addEventListener('click', (e)=>{
-  e.preventDefault();
-  showCookieNotice(); // always reachable manually, regardless of region
-});
 
 // ============================================================
 // FEEDBACK
@@ -812,8 +826,35 @@ function saveFeedbackEntries(list){
   localStorage.setItem(FEEDBACK_KEY, JSON.stringify(list));
 }
 
+const FEEDBACK_DRAFT_KEY = 'feedbackDraft';
+function saveFeedbackDraft(){
+  const nameEl = document.getElementById('fbName');
+  const msgEl = document.getElementById('fbMessage');
+  if(!nameEl || !msgEl) return; // feedback form isn't the one currently open
+  const name = nameEl.value;
+  const message = msgEl.value;
+  if(name || message){
+    localStorage.setItem(FEEDBACK_DRAFT_KEY, JSON.stringify({name, message}));
+  } else {
+    localStorage.removeItem(FEEDBACK_DRAFT_KEY);
+  }
+}
+function getFeedbackDraft(){
+  try{ return JSON.parse(localStorage.getItem(FEEDBACK_DRAFT_KEY)) || {name:'', message:''}; }
+  catch(e){ return {name:'', message:''}; }
+}
+function clearFeedbackDraft(){
+  localStorage.removeItem(FEEDBACK_DRAFT_KEY);
+}
+
 function closeFeedbackForm(){
+  saveFeedbackDraft(); // keep any unsubmitted text so it's there next time this opens
   document.getElementById('feedbackContainer').innerHTML = '';
+  setActiveFooterIcon(null);
+}
+function setActiveFooterIcon(id){
+  document.querySelectorAll('.footer-icon').forEach(a=>a.classList.remove('active'));
+  if(id) document.getElementById(id).classList.add('active');
 }
 function showFeedbackConfirmation(){
   const container = document.getElementById('feedbackContainer');
@@ -822,22 +863,27 @@ function showFeedbackConfirmation(){
       <p class="feedback-confirm">Your feedback has been fed back. Thanks!</p>
     </section>
   `;
+  setActiveFooterIcon(null);
   setTimeout(()=>{
     // only clear if the confirmation is still what's showing (user hasn't
-    // reopened the form again in the meantime)
+    // opened another panel in the meantime)
     if(container.querySelector('.feedback-confirm')) container.innerHTML = '';
   }, 5000);
 }
 function openFeedbackForm(){
   const container = document.getElementById('feedbackContainer');
   if(container.querySelector('#feedbackForm')){ closeFeedbackForm(); return; } // toggle off if already open
+  setActiveFooterIcon('feedbackLink');
+  const draft = getFeedbackDraft();
+  const draftName = draft.name.replace(/"/g,'&quot;');
+  const draftMessage = draft.message.replace(/</g,'&lt;');
   container.innerHTML = `
     <section class="feedback-section">
       <h2 class="state-name">Feedback</h2>
       <p class="feedback-note">Have a suggestion, spotted a broken link, or just want to say hello? Leave a note below.</p>
       <form id="feedbackForm" class="feedback-form">
-        <input type="text" id="fbName" name="name" placeholder="Your name" required maxlength="80">
-        <textarea id="fbMessage" name="message" placeholder="Your feedback…" required maxlength="2000" rows="3"></textarea>
+        <input type="text" id="fbName" name="name" placeholder="Your name" required maxlength="80" value="${draftName}">
+        <textarea id="fbMessage" name="message" placeholder="Your feedback…" required maxlength="2000" rows="3">${draftMessage}</textarea>
         <div class="feedback-actions">
           <button type="submit" class="fb-btn primary">Submit Feedback</button>
           <span id="fbStatus" class="feedback-status"></span>
@@ -845,6 +891,8 @@ function openFeedbackForm(){
       </form>
     </section>
   `;
+  document.getElementById('fbName').addEventListener('input', saveFeedbackDraft);
+  document.getElementById('fbMessage').addEventListener('input', saveFeedbackDraft);
   document.getElementById('feedbackForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
     const name = document.getElementById('fbName').value.trim();
@@ -855,7 +903,8 @@ function openFeedbackForm(){
     const entries = getFeedbackEntries();
     entries.push(entry);
     saveFeedbackEntries(entries);
-    
+    clearFeedbackDraft(); // submitted successfully, nothing left to retain
+
     if(FEEDBACK_ENDPOINT){
       try{
         // Sent as form-encoded (not JSON) and without custom headers so this
@@ -867,16 +916,97 @@ function openFeedbackForm(){
           body: new URLSearchParams(entry)
         });
       }
-      catch(err){ /* local copy + download already happened even if this fails */ }
+      catch(err){ /* local copy is already saved even if this fails */ }
     }
 
     showFeedbackConfirmation(); // replace the form with a thank-you message
   });
   try{ container.scrollIntoView({behavior:'smooth', block:'center'}); }catch(err){ /* not fatal if unsupported */ }
 }
+
+// ---- Privacy Policy and Cookies footer panels ----
+const PRIVACY_TEXT = `
+  <p>This site doesn't collect personal information directly — it's a static page with no account system or server-side database. The only thing stored locally is your cookie-consent choice and, if you've used it, your feedback submissions — both saved in this browser via <code>localStorage</code>.</p>
+  <p>If you accept cookies, this site loads <strong>Google AdSense</strong> to show ads, which may set cookies for ad personalisation. You can review or change your Google ad settings at <a href="https://adssettings.google.com" target="_blank" rel="noopener">adssettings.google.com</a>.</p>
+  <p>Links to official government websites are covered by those sites' own privacy policies, not this one.</p>
+  <p><a href="privacy.html" target="_blank" rel="noopener">Read the full Privacy Policy →</a></p>
+`;
+const COOKIES_TEXT = `
+  <p>This site uses cookies from <strong>Google AdSense</strong> to show and personalise ads, only after you accept. If you decline, no ad cookies are set.</p>
+  <p>You can change your choice at any time — just pick again below.</p>
+`;
+
+function openInfoPanel(id, title, bodyHtml){
+  const container = document.getElementById('feedbackContainer');
+  if(container.querySelector(`[data-panel="${id}"]`)){ closeFeedbackForm(); return; } // toggle off
+  setActiveFooterIcon(id + 'Link');
+  container.innerHTML = `
+    <section class="feedback-section" data-panel="${id}">
+      <h2 class="state-name">${title}</h2>
+      <div class="feedback-note info-panel-body">${bodyHtml}</div>
+    </section>
+  `;
+  try{ container.scrollIntoView({behavior:'smooth', block:'center'}); }catch(err){ /* not fatal if unsupported */ }
+}
+
+function openPrivacyPanel(){
+  openInfoPanel('privacy', 'Privacy Policy', PRIVACY_TEXT);
+}
+function openCookiesPanel(){
+  const container = document.getElementById('feedbackContainer');
+  if(container.querySelector('[data-panel="cookies"]')){ closeFeedbackForm(); return; }
+  setActiveFooterIcon('cookiesLink');
+  const current = localStorage.getItem(CONSENT_KEY);
+  const currentLine = current
+    ? `<p class="feedback-note small">Current choice: <strong>${current === 'accepted' ? 'Accepted' : 'Declined'}</strong></p>`
+    : `<p class="feedback-note small">No choice recorded yet in this browser.</p>`;
+  container.innerHTML = `
+    <section class="feedback-section" data-panel="cookies">
+      <h2 class="state-name">Cookies</h2>
+      <div class="feedback-note info-panel-body">${COOKIES_TEXT}</div>
+      ${currentLine}
+      <div class="feedback-actions">
+        <button type="button" id="cookiesPanelAccept" class="fb-btn primary">Accept</button>
+        <button type="button" id="cookiesPanelDecline" class="fb-btn">Decline</button>
+      </div>
+    </section>
+  `;
+  document.getElementById('cookiesPanelAccept').addEventListener('click', ()=>{
+    localStorage.setItem(CONSENT_KEY, 'accepted');
+    loadAdsenseScript();
+    closeFeedbackForm();
+  });
+  document.getElementById('cookiesPanelDecline').addEventListener('click', ()=>{
+    localStorage.setItem(CONSENT_KEY, 'declined');
+    closeFeedbackForm();
+  });
+  try{ container.scrollIntoView({behavior:'smooth', block:'center'}); }catch(err){ /* not fatal if unsupported */ }
+}
+
 document.getElementById('feedbackLink').addEventListener('click', (e)=>{
   e.preventDefault();
   openFeedbackForm();
+});
+document.getElementById('privacyLink').addEventListener('click', (e)=>{
+  e.preventDefault();
+  openPrivacyPanel();
+});
+document.getElementById('cookiesLink').addEventListener('click', (e)=>{
+  e.preventDefault();
+  openCookiesPanel();
+});
+
+// Clicking anywhere else on the page (a state on the map, a result
+// link, the theme toggle, etc.) collapses whichever footer panel
+// (Feedback / Privacy / Cookies) is currently open. Clicks inside the
+// open panel itself, or on the footer icons (which manage their own
+// open/close/switch already), are left alone.
+document.addEventListener('click', (e)=>{
+  const container = document.getElementById('feedbackContainer');
+  if(!container.innerHTML.trim()) return; // nothing open
+  if(e.target.closest('#feedbackContainer')) return;
+  if(e.target.closest('.footer-icon')) return;
+  closeFeedbackForm();
 });
 </script>
 </body>
