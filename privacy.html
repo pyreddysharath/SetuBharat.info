@@ -62,7 +62,7 @@ footer{
 </head>
 <body>
 <div class="wrap">
-  <a class="back" href="index.html">← Back to the map</a>
+  <a class="back" id="backLink" href="index.html">← Back to the map</a>
 
   <h1>Privacy Policy</h1>
   <div class="updated">Last updated: 24 July 2026</div>
@@ -102,5 +102,13 @@ footer{
     India States &amp; Union Territories Explorer — this policy covers the Site only, not any linked third-party or government websites.
   </footer>
 </div>
+<script>
+  // If this page was opened from a specific state's Privacy panel
+  // (e.g. privacy.html#Kerala), send "Back to the map" to that same
+  // state instead of the generic homepage.
+  if (location.hash) {
+    document.getElementById('backLink').href = 'index.html' + location.hash;
+  }
+</script>
 </body>
 </html>

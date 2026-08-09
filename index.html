@@ -930,12 +930,15 @@ function openFeedbackForm(){
 }
 
 // ---- Privacy Policy and Cookies footer panels ----
-const PRIVACY_TEXT = `
+function privacyText(){
+  const backHash = location.hash || '';
+  return `
   <p>This site doesn't collect personal information directly — it's a static page with no account system or server-side database. The only thing stored locally is your cookie-consent choice and, if you've used it, your feedback submissions — both saved in this browser via <code>localStorage</code>.</p>
   <p>If you accept cookies, this site loads <strong>Google AdSense</strong> to show ads, which may set cookies for ad personalisation. You can review or change your Google ad settings at <a href="https://adssettings.google.com" target="_blank" rel="noopener">adssettings.google.com</a>.</p>
   <p>Links to official government websites are covered by those sites' own privacy policies, not this one.</p>
-  <p><a href="privacy.html" target="_blank" rel="noopener">Read the full Privacy Policy →</a></p>
+  <p><a href="privacy.html${backHash}" target="_blank" rel="noopener">Read the full Privacy Policy →</a></p>
 `;
+}
 const COOKIES_TEXT = `
   <p>This site uses cookies from <strong>Google AdSense</strong> to show and personalise ads, only after you accept. If you decline, no ad cookies are set.</p>
   <p>You can change your choice at any time — just pick again below.</p>
@@ -955,7 +958,7 @@ function openInfoPanel(id, title, bodyHtml){
 }
 
 function openPrivacyPanel(){
-  openInfoPanel('privacy', 'Privacy Policy', PRIVACY_TEXT);
+  openInfoPanel('privacy', 'Privacy Policy', privacyText());
 }
 function openCookiesPanel(){
   const container = document.getElementById('feedbackContainer');
