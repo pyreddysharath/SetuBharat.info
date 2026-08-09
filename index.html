@@ -51,8 +51,8 @@
 }
 html[data-theme="light"]{
   --ink:#1A1A1A;
-  --paper:#E4E4E4;
-  --paper-dim:#D2D2D2;
+  --paper:#FFFFFF;
+  --paper-dim:#EDEDED;
   --seal:#A6303C;
   --seal-dark:#7c1f28;
   --teal:#CFCFCF;
@@ -234,6 +234,14 @@ svg#india path.active{animation:pathIn .5s ease forwards, stampIn .35s ease-out}
 }
 .site-card:hover{border-color:var(--ink);box-shadow:3px 3px 0 rgba(0,0,0,.5)}
 .site-card:hover .body h4{text-decoration:underline}
+.site-card.link-saffron{background:#F0A030;border-color:#B5661A}
+.site-card.link-saffron .body h4{color:#1A1A1A}
+.site-card.link-white{background:#FFFFFF;border-color:#8A8A8A}
+.site-card.link-white .body h4{color:#1A1A1A}
+.site-card.link-green{background:#4FAE41;border-color:#0B5C05}
+.site-card.link-green .body h4{color:#1A1A1A}
+.site-card.link-darkgrey{background:#000000;border-color:#3A3A3A}
+.site-card.link-darkgrey .body h4{color:#FFFFFF}
 .site-card .icon{font-size:1.2rem;flex:none}
 .site-card .body{flex:1;min-width:0}
 .site-card .body h4{margin:0;font-size:.9rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -607,13 +615,25 @@ function renderDetail(id){
   const catsPresent = {};
   s.sites.forEach(site => { (catsPresent[site.cat] = catsPresent[site.cat]||[]).push(site); });
 
+  // Single running counter so the saffron/white/green cycle flows
+  // continuously from the very first state link all the way through
+  // to the last link in the Pan-India Services section, rather than
+  // restarting at each category.
+  let linkColorIndex = 0;
+  const LINK_COLOR_CLASSES = ['link-saffron','link-white','link-green','link-darkgrey'];
+  function nextLinkColor(){
+    const cls = LINK_COLOR_CLASSES[linkColorIndex % 4];
+    linkColorIndex++;
+    return cls;
+  }
+
   let sitesHtml = '';
   CAT_ORDER.forEach(cat=>{
     if(!catsPresent[cat]) return;
     const labelKey = cat === 'portal' ? 'portal' : cat === 'tourism' ? 'tourism' : cat === 'police' ? 'police' : 'directory';
     sitesHtml += `<div class="cat-block">
       <div class="cat-title"><span class="dot" style="background:${s.accent}"></span>${tLabel(lang, labelKey, CAT_LABELS[cat])}</div>
-      ${catsPresent[cat].map(site=>siteCardHtml(site)).join('')}
+      ${catsPresent[cat].map(site=>siteCardHtml(site, nextLinkColor())).join('')}
     </div>`;
   });
 
@@ -624,19 +644,19 @@ function renderDetail(id){
     stateServicesHtml = `<div class="section-label">${tLabel(lang, 'stateServices', 'State Service Portals')}</div>` +
       Object.keys(groups).map(g => `<div class="cat-block">
         <div class="cat-title"><span class="dot" style="background:${s.accent}"></span>${g}</div>
-        ${groups[g].map(site=>siteCardHtml(site)).join('')}
+        ${groups[g].map(site=>siteCardHtml(site, nextLinkColor())).join('')}
       </div>`).join('');
   }
 
   let idHtml = `<div class="cat-block">
     <div class="cat-title"><span class="dot" style="background:${s.accent}"></span>${tLabel(lang, 'citizenId', 'Citizen ID &amp; Documents')}</div>
     <p class="national-note">Aadhaar, passport, voter and civil-registration services — available nationwide.</p>
-    ${s.idServices.map(site=>siteCardHtml(site)).join('')}
+    ${s.idServices.map(site=>siteCardHtml(site, nextLinkColor())).join('')}
   </div>`;
 
   let nationalHtml = `<div class="cat-block">
     <div class="cat-title"><span class="dot" style="background:${s.accent}"></span>${tLabel(lang, 'nationalServices', 'National Citizen Services')}</div>
-    ${s.national.map(site=>siteCardHtml(site)).join('')}
+    ${s.national.map(site=>siteCardHtml(site, nextLinkColor())).join('')}
   </div>`;
 
   col.innerHTML = `
@@ -659,6 +679,13 @@ function renderDetail(id){
 function renderDefault(){
   const col = document.getElementById('detailCol');
   const any = STATES[ids[0]];
+  let defaultColorIndex = 0;
+  const DEFAULT_LINK_COLOR_CLASSES = ['link-saffron','link-white','link-green','link-darkgrey'];
+  function nextDefaultLinkColor(){
+    const cls = DEFAULT_LINK_COLOR_CLASSES[defaultColorIndex % 4];
+    defaultColorIndex++;
+    return cls;
+  }
   col.innerHTML = `
     <div class="state-panel">
       <div class="state-images">
@@ -671,10 +698,10 @@ function renderDefault(){
 
       <div class="section-label">Citizen ID &amp; Documents</div>
       <p class="national-note">Aadhaar, passport, voter and civil-registration services.</p>
-      ${any.idServices.map(site=>siteCardHtml(site)).join('')}
+      ${any.idServices.map(site=>siteCardHtml(site, nextDefaultLinkColor())).join('')}
 
       <div class="section-label">National Citizen Services</div>
-      ${any.national.map(site=>siteCardHtml(site)).join('')}
+      ${any.national.map(site=>siteCardHtml(site, nextDefaultLinkColor())).join('')}
       ${AD_SLOT_PANEL_HTML}
     </div>
   `;
@@ -709,10 +736,11 @@ document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape' && selectedId) deselectState();
 });
 
-function siteCardHtml(site){
+function siteCardHtml(site, colorClass){
   const safeUrl = site.url.replace(/"/g,'&quot;');
   const safeDesc = (site.desc||'').replace(/"/g,'&quot;');
-  return `<a class="site-card" href="${safeUrl}" target="_blank" rel="noopener" title="${safeDesc}">
+  const cls = colorClass ? ` ${colorClass}` : '';
+  return `<a class="site-card${cls}" href="${safeUrl}" target="_blank" rel="noopener" title="${safeDesc}">
     <div class="icon">${site.icon||'🔗'}</div>
     <div class="body">
       <h4>${site.title}</h4>
