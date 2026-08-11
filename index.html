@@ -106,7 +106,7 @@ body{
 
 .map-shell{
   width:min(1012px, calc((100vh - 90px) * 1.1));
-  margin: -120px auto 0;
+  margin: -145px auto 0;
   max-width:100%;
   position:relative;
   perspective:1400px;
@@ -174,6 +174,44 @@ svg#india path.active{animation:pathIn .5s ease forwards, stampIn .35s ease-out}
   position:relative;
 }
 .detail-col::-webkit-scrollbar{width:10px}
+
+.site-search-wrap{
+  position:sticky;top:0;z-index:15;
+  background:var(--paper);
+  padding:16px 24px 10px;
+  border-bottom:1px solid var(--line);
+}
+.site-search-input{
+  width:100%;font-family:'Inter',sans-serif;font-size:.88rem;
+  background:var(--white);border:1.5px solid var(--line);border-radius:8px;
+  padding:10px 14px;color:var(--ink);outline:none;
+  transition:border-color .15s;
+}
+.site-search-input:focus{border-color:var(--seal)}
+.site-search-dropdown{
+  position:absolute;left:24px;right:24px;top:calc(100% - 4px);
+  background:var(--white);border:1.5px solid var(--ink);border-radius:8px;
+  max-height:min(420px, 60vh);overflow-y:auto;
+  box-shadow:4px 4px 0 rgba(0,0,0,.4);
+  display:none;
+}
+.site-search-dropdown.show{display:block}
+.site-search-group-label{
+  font-family:'IBM Plex Mono',monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--seal);padding:9px 14px 5px;
+}
+.site-search-result{
+  display:flex;gap:8px;align-items:flex-start;padding:8px 14px;
+  text-decoration:none;color:inherit;cursor:pointer;
+  border-top:1px solid var(--line);
+}
+.site-search-group-label + .site-search-result{border-top:none}
+.site-search-result:hover{background:var(--paper-dim)}
+.site-search-result .icon{font-size:1.05rem;flex:none;padding-top:1px}
+.site-search-result .meta{flex:1;min-width:0}
+.site-search-result .meta .title{font-size:.85rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.site-search-result .meta .sub{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.site-search-empty{padding:14px;font-size:.82rem;color:var(--muted);text-align:center}
 .detail-col::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
 
 .empty-state{
@@ -226,7 +264,7 @@ svg#india path.active{animation:pathIn .5s ease forwards, stampIn .35s ease-out}
 .cat-title .dot{width:8px;height:8px;border-radius:50%;background:var(--seal);display:inline-block}
 
 .site-card{
-  display:flex;gap:10px;align-items:center;
+  display:flex;gap:10px;align-items:flex-start;
   background:var(--white);border:1px solid var(--line);border-radius:8px;
   padding:9px 12px;margin-bottom:6px;
   text-decoration:none;color:inherit;cursor:pointer;
@@ -234,10 +272,24 @@ svg#india path.active{animation:pathIn .5s ease forwards, stampIn .35s ease-out}
 }
 .site-card:hover{border-color:var(--ink);box-shadow:3px 3px 0 rgba(0,0,0,.5)}
 .site-card:hover .body h4{text-decoration:underline}
-.site-card .icon{font-size:1.2rem;flex:none}
+.site-card .icon{font-size:1.2rem;flex:none;padding-top:1px}
 .site-card .body{flex:1;min-width:0}
 .site-card .body h4{margin:0;font-size:.9rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.site-card .actions{display:flex;flex-direction:row;gap:6px;flex:none}
+.site-card .actions{display:flex;flex-direction:row;gap:6px;flex:none;align-items:flex-start}
+.site-desc{
+  display:none;margin:5px 0 0;font-size:.78rem;line-height:1.45;color:var(--muted);
+}
+.site-card.desc-open .site-desc{display:block}
+.site-card.desc-open .body h4{white-space:normal}
+.info-btn{
+  width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line);
+  background:var(--white);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:.76rem;font-style:italic;font-family:Georgia,serif;
+  color:var(--muted);flex:none;transition:background .15s,border-color .15s,color .15s;
+  padding:0;
+}
+.info-btn:hover{background:var(--paper-dim);border-color:var(--ink);color:var(--ink)}
+.site-card.desc-open .info-btn{background:var(--seal);border-color:var(--seal);color:#fff}
 .icon-btn{
   width:30px;height:30px;border-radius:6px;border:1.5px solid var(--ink);
   background:var(--white);display:flex;align-items:center;justify-content:center;
@@ -433,7 +485,13 @@ footer.foot a{color:var(--teal-light)}
     </div>
   </section>
 
-  <section class="detail-col" id="detailCol"></section>
+  <section class="detail-col" id="detailCol">
+    <div class="site-search-wrap">
+      <input type="text" id="siteSearchInput" class="site-search-input" placeholder="🔎 Search government sites by name, purpose or URL…" autocomplete="off" aria-label="Search government sites">
+      <div id="siteSearchResults" class="site-search-dropdown"></div>
+    </div>
+    <div id="detailContent"></div>
+  </section>
 </div>
 
 <!-- ============================================================
@@ -645,7 +703,7 @@ const AD_SLOT_PANEL_HTML = `
 
 function renderDetail(id){
   const s = STATES[id];
-  const col = document.getElementById('detailCol');
+  const col = document.getElementById('detailContent');
   const lang = s.language;
 
   const catsPresent = {};
@@ -696,12 +754,12 @@ function renderDetail(id){
       ${AD_SLOT_PANEL_HTML}
     </div>
   `;
-  col.scrollTop = 0;
+  document.getElementById('detailCol').scrollTop = 0;
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
 function renderDefault(){
-  const col = document.getElementById('detailCol');
+  const col = document.getElementById('detailContent');
   const any = STATES[ids[0]];
   col.innerHTML = `
     <div class="state-panel">
@@ -756,12 +814,15 @@ document.addEventListener('keydown', (e)=>{
 function siteCardHtml(site){
   const safeUrl = site.url.replace(/"/g,'&quot;');
   const safeDesc = (site.desc||'').replace(/"/g,'&quot;');
+  const hasDesc = !!(site.desc && site.desc.trim());
   return `<a class="site-card" href="${safeUrl}" target="_blank" rel="noopener" title="${safeDesc}">
     <div class="icon">${site.icon||'🔗'}</div>
     <div class="body">
       <h4>${site.title}</h4>
+      ${hasDesc ? `<p class="site-desc">${site.desc}</p>` : ''}
     </div>
     <div class="actions">
+      ${hasDesc ? `<button type="button" class="info-btn" aria-label="What is this site?" title="What is this site?">ⓘ</button>` : ''}
       <span class="icon-btn" aria-hidden="true">↗</span>
     </div>
   </a>`;
@@ -1034,6 +1095,119 @@ document.getElementById('cookiesLink').addEventListener('click', (e)=>{
 document.getElementById('disclaimerLink').addEventListener('click', (e)=>{
   e.preventDefault();
   openDisclaimerPanel();
+});
+
+// ============================================================
+// SITE DESCRIPTION TOGGLE ("ⓘ" button on each result card)
+// Delegated on document since site-cards are re-rendered on every
+// state selection. Prevents the click from also triggering the
+// card's own link navigation.
+// ============================================================
+document.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.info-btn');
+  if(!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const card = btn.closest('.site-card');
+  if(card) card.classList.toggle('desc-open');
+});
+
+// ============================================================
+// SITE SEARCH
+// A single search box above the results list. Typing filters across
+// every state's own links plus the shared Pan-India (national +
+// idServices) links, matching keyword against title, url, or desc.
+// Results are grouped: "India" first (deduplicated, since national
+// links are identical across every state), then one group per state
+// that has a match. Clicking a result opens that link directly, the
+// same as clicking a site-card.
+// ============================================================
+const SEARCH_INDEX = (function buildSearchIndex(){
+  const items = [];
+  const seenNational = new Set();
+  Object.keys(STATES).forEach(stateId=>{
+    const s = STATES[stateId];
+    (s.sites||[]).forEach(site=> items.push({ scope: stateId, stateName: s.name, ...site }));
+    (s.stateServices||[]).forEach(site=> items.push({ scope: stateId, stateName: s.name, ...site }));
+    (s.idServices||[]).forEach(site=>{
+      const key = 'id:' + site.url;
+      if(seenNational.has(key)) return;
+      seenNational.add(key);
+      items.push({ scope: 'india', stateName: 'India', ...site });
+    });
+    (s.national||[]).forEach(site=>{
+      const key = 'nat:' + site.url;
+      if(seenNational.has(key)) return;
+      seenNational.add(key);
+      items.push({ scope: 'india', stateName: 'India', ...site });
+    });
+  });
+  return items;
+})();
+
+function searchSites(query){
+  const q = query.trim().toLowerCase();
+  if(!q) return [];
+  const matches = SEARCH_INDEX.filter(item=>
+    (item.title && item.title.toLowerCase().includes(q)) ||
+    (item.url && item.url.toLowerCase().includes(q)) ||
+    (item.desc && item.desc.toLowerCase().includes(q))
+  );
+  // Group: India first, then each state, preserving first-seen order within each group.
+  const groups = {};
+  const order = [];
+  matches.forEach(item=>{
+    const key = item.scope === 'india' ? 'India' : item.stateName;
+    if(!groups[key]){ groups[key] = []; order.push(key); }
+    if(groups[key].length < 8) groups[key].push(item); // cap per group so the dropdown stays scannable
+  });
+  order.sort((a,b)=>{
+    if(a === 'India') return -1;
+    if(b === 'India') return 1;
+    return a.localeCompare(b);
+  });
+  return order.map(key=>({ label: key, items: groups[key] }));
+}
+
+function renderSearchResults(query){
+  const dropdown = document.getElementById('siteSearchResults');
+  const grouped = searchSites(query);
+  if(!grouped.length){
+    dropdown.innerHTML = query.trim()
+      ? `<div class="site-search-empty">No matching sites found.</div>`
+      : '';
+    dropdown.classList.toggle('show', !!query.trim());
+    return;
+  }
+  dropdown.innerHTML = grouped.map(group=>`
+    <div class="site-search-group-label">${group.label}</div>
+    ${group.items.map(item=>{
+      const safeUrl = item.url.replace(/"/g,'&quot;');
+      const safeDesc = (item.desc||'').replace(/"/g,'&quot;');
+      return `<a class="site-search-result" href="${safeUrl}" target="_blank" rel="noopener" title="${safeDesc}">
+        <span class="icon">${item.icon||'🔗'}</span>
+        <span class="meta">
+          <span class="title">${item.title}</span>
+          <span class="sub">${item.url}</span>
+        </span>
+      </a>`;
+    }).join('')}
+  `).join('');
+  dropdown.classList.add('show');
+}
+
+const searchInput = document.getElementById('siteSearchInput');
+searchInput.addEventListener('input', (e)=> renderSearchResults(e.target.value));
+searchInput.addEventListener('focus', (e)=>{ if(e.target.value.trim()) renderSearchResults(e.target.value); });
+document.addEventListener('click', (e)=>{
+  if(e.target.closest('.site-search-wrap')) return;
+  document.getElementById('siteSearchResults').classList.remove('show');
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    document.getElementById('siteSearchResults').classList.remove('show');
+    searchInput.blur();
+  }
 });
 </script>
 </body>
