@@ -285,7 +285,8 @@ svg#india path.active{animation:pathIn .5s ease forwards, stampIn .35s ease-out}
   background:var(--paper-dim);display:flex;align-items:center;justify-content:center;
 }
 .site-card .body{flex:1;min-width:0;padding-top:3px}
-.site-card .body h4{margin:0;font-size:.9rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.site-card .body h4{margin:0;display:flex;align-items:center;min-width:0}
+.site-card .body .title-text{font-size:.9rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .site-card .actions{display:flex;flex-direction:row;gap:6px;flex:none;align-items:flex-start;padding-top:2px}
 .site-desc{
   display:none;margin:5px 0 0;font-size:.78rem;line-height:1.45;color:var(--muted);
@@ -293,21 +294,23 @@ svg#india path.active{animation:pathIn .5s ease forwards, stampIn .35s ease-out}
 .site-card.desc-open .site-desc{display:block}
 .site-card.desc-open .body h4{white-space:normal}
 .info-btn{
-  width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line);
-  background:var(--white);display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:.76rem;font-style:italic;font-family:Georgia,serif;
-  color:var(--muted);flex:none;transition:background .15s,border-color .15s,color .15s;
-  padding:0;
+  width:18px;height:18px;border:none;border-radius:50%;
+  background:#8EC5F0;display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;flex:none;transition:background .15s,transform .15s;
+  padding:0;vertical-align:middle;margin-left:6px;
+  font-family:Georgia,'Times New Roman',serif;font-size:.72rem;font-weight:800;
+  font-style:italic;color:#FFFFFF;line-height:1;
 }
-.info-btn:hover{background:var(--paper-dim);border-color:var(--ink);color:var(--ink)}
-.site-card.desc-open .info-btn{background:var(--seal);border-color:var(--seal);color:#fff}
+.info-btn:hover{background:#6FB2E8;transform:scale(1.12)}
+.site-card.desc-open .info-btn{background:var(--seal)}
 .icon-btn{
-  width:30px;height:30px;border-radius:50%;border:1.5px solid var(--ink);
-  background:var(--white);display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:.9rem;transition:background .15s,transform .2s;
+  width:22px;height:22px;border:none;border-radius:0;
+  background:transparent;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:transform .2s,color .15s;
   text-decoration:none;color:var(--ink);
 }
-.site-card:hover .icon-btn{background:var(--ink);color:var(--paper);transform:rotate(45deg)}
+.icon-btn svg{width:18px;height:18px}
+.site-card:hover .icon-btn{color:var(--seal);transform:translate(2px,-2px)}
 
 .national-note{
   font-size:.78rem;color:var(--muted);margin:4px 0 4px;line-height:1.5;
@@ -844,12 +847,11 @@ function siteCardHtml(site){
   return `<a class="site-card" href="${safeUrl}" target="_blank" rel="noopener" title="${safeDesc}">
     <div class="icon">${site.icon||'🔗'}</div>
     <div class="body">
-      <h4>${site.title}</h4>
+      <h4><span class="title-text">${site.title}</span>${hasDesc ? `<button type="button" class="info-btn" aria-label="What is this site?" title="What is this site?">i</button>` : ''}</h4>
       ${hasDesc ? `<p class="site-desc">${site.desc}</p>` : ''}
     </div>
     <div class="actions">
-      ${hasDesc ? `<button type="button" class="info-btn" aria-label="What is this site?" title="What is this site?">ⓘ</button>` : ''}
-      <span class="icon-btn" aria-hidden="true">↗</span>
+      <span class="icon-btn" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 8.7V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4.3"/><path d="M9.5 2h4.5v4.5"/><line x1="6.5" y1="9.5" x2="14" y2="2"/></svg></span>
     </div>
   </a>`;
 }
