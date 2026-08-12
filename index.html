@@ -169,8 +169,9 @@ svg#india path.active{animation:pathIn .5s ease forwards, stampIn .35s ease-out}
   white-space:nowrap;text-align:center;
 }
 .hover-tip.show{opacity:1}
-.hover-tip .tip-name{font-size:.76rem}
-.hover-tip .tip-sub{font-size:.64rem;color:#C9C9C9;margin-top:2px}
+.hover-tip .tip-name{font-size:.78rem;font-weight:700}
+.hover-tip .tip-sub{font-size:.64rem;color:var(--white);opacity:.75;margin-top:2px}
+.hover-tip .tip-sub + .tip-sub{margin-top:1px}
 
 /* ---------- Detail column ---------- */
 .detail-col{
@@ -652,11 +653,10 @@ document.body.appendChild(tip);
 
 function tipHtmlFor(s){
   const nameLine = s.stateNameNative === s.name ? s.name : (s.name + ' · ' + s.stateNameNative);
-  const subParts = [];
-  if(s.capital) subParts.push('Capital: ' + s.capital);
-  if(s.language) subParts.push(s.language);
-  const subLine = subParts.join(' · ');
-  return `<div class="tip-name">${nameLine}</div>${subLine ? `<div class="tip-sub">${subLine}</div>` : ''}`;
+  let html = `<div class="tip-name">${nameLine}</div>`;
+  if(s.capital) html += `<div class="tip-sub">Capital: ${s.capital}</div>`;
+  if(s.language) html += `<div class="tip-sub">Language: ${s.language}</div>`;
+  return html;
 }
 
 let visited = new Set();
