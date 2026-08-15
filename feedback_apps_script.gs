@@ -3,13 +3,13 @@
  *
  * Paste this into a Google Sheet's Apps Script editor (Extensions > Apps
  * Script), deploy it as a Web App, and point FEEDBACK_ENDPOINT in
- * india_atlas.html at the deployment URL. Every feedback submission on
+ * HEALThee.html at the deployment URL. Every feedback submission on
  * the site will then also be appended as a new row here, in real time,
  * from every visitor — not just stored in one person's browser.
  *
  * SETUP
  * 1. Create a new Google Sheet (sheets.new).
- * 2. In row 1, add headers:  Date | Name | Message
+ * 2. In row 1, add headers:  Date | Website | Name | Message | Status
  * 3. Extensions > Apps Script. Delete the placeholder code and paste
  *    in everything below.
  * 4. Click Deploy > New deployment.
@@ -21,10 +21,9 @@
  *    the script — approve it (it's your own script, acting on your
  *    own sheet).
  * 6. Copy the "Web app URL" shown after deploying (it ends in /exec).
- * 7. In india_atlas.html, find:
- *        const FEEDBACK_ENDPOINT = null;
- *    and change it to:
- *        const FEEDBACK_ENDPOINT = 'PASTE_YOUR_URL_HERE';
+ * 7. In HEALThee.html, find:
+ *        const FEEDBACK_ENDPOINT = ...;
+ *    and set it to your deployed Web App URL.
  *
  * That's it — no API keys, no billing, this runs on Google's free tier
  * for personal Apps Script usage.
@@ -36,11 +35,13 @@
 function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var date = (e.parameter && e.parameter.date) || new Date().toISOString();
+    var date = (e.parameter && e.parameter.date) || Utilities.formatDate(new Date().toISOString(), "Asia/Kolkata", "yyyy-MM-dd HH:mm:ss");
+    var website = (e.parameter && e.parameter.Website) || '';
     var name = (e.parameter && e.parameter.name) || '';
     var message = (e.parameter && e.parameter.message) || '';
+    var status = (e.parameter && e.parameter.Status) || '';
 
-    sheet.appendRow([date, name, message]);
+    sheet.appendRow([date, website, name, message, status]);
 
     return ContentService
       .createTextOutput(JSON.stringify({ status: 'ok' }))
