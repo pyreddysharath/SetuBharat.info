@@ -504,7 +504,7 @@ footer.foot a{color:var(--teal-light)}
 .theme-toggle:hover{transform:translateY(-2px) rotate(12deg)}
 
 .toggle-labels-btn{
-  position:absolute;top:40px;right:4px;z-index:250;
+  position:absolute;top:38px;right:4px;z-index:250;
   width:32px;height:32px;
   border:none;background:transparent;color:#757575;
   cursor:pointer;padding:0;
@@ -516,14 +516,14 @@ footer.foot a{color:var(--teal-light)}
 .toggle-labels-btn[aria-pressed="true"]{opacity:.4}
 
 .page-reset{
-  position:absolute;top:74px;right:4px;z-index:250;
-  width:32px;height:32px;
+  position:absolute;top:70px;right:8px;z-index:250;
+  width:24px;height:24px;
   border:none;background:transparent;color:#138808;
   cursor:pointer;padding:0;
   display:flex;align-items:center;justify-content:center;
   transition:transform .2s ease;
 }
-.page-reset svg{width:22px;height:22px;stroke:currentColor}
+.page-reset svg{width:16px;height:16px;stroke:currentColor}
 .page-reset:hover{transform:translateY(-2px) rotate(-90deg)}
 </style>
 </head>
@@ -537,7 +537,7 @@ footer.foot a{color:var(--teal-light)}
         <path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>
       </svg>
     </button>
-    <button id="toggleLabels" class="toggle-labels-btn" title="Hide state names" aria-label="Toggle state name labels" aria-pressed="false">
+    <button id="toggleLabels" class="toggle-labels-btn" title="Show state names" aria-label="Toggle state name labels" aria-pressed="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/>
         <circle cx="12" cy="10" r="2.5"/>
@@ -550,7 +550,7 @@ footer.foot a{color:var(--teal-light)}
       </svg>
     </button>
     <div class="map-shell">
-      <svg id="india" viewBox="0 0 1000 1136" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of India">
+      <svg id="india" class="labels-hidden" viewBox="0 0 1000 1136" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of India">
         <defs>
           <symbol id="ic-dome" viewBox="0 0 48 48"><path d="M12 38h24M16 38V26a8 8 0 0 1 16 0v12M20 26a4 4 0 0 1 8 0M24 10v6M20 10h8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
           <symbol id="ic-temple" viewBox="0 0 48 48"><path d="M24 6l4 6h-8l4-6zM18 12h12v4H18zM16 16h16l3 22H13l3-22zM13 38h22M20 24v10M28 24v10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
