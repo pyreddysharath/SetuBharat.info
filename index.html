@@ -144,6 +144,8 @@ svg#india text.state-label{
   text-anchor:middle;dominant-baseline:middle;
   pointer-events:none;user-select:none;
 }
+html:not([data-theme="light"]) svg#india text.state-label{fill:#757575}
+svg#india.labels-hidden text.state-label{display:none}
 svg#india path:focus-visible{
   outline:3px solid var(--seal);outline-offset:2px;
 }
@@ -491,7 +493,7 @@ footer.foot a{color:var(--teal-light)}
 
 /* ---------- Theme toggle ---------- */
 .theme-toggle{
-  position:absolute;top:12px;right:4px;z-index:250;
+  position:absolute;top:6px;right:4px;z-index:250;
   width:32px;height:32px;
   border:none;background:transparent;color:#FF9933;
   cursor:pointer;padding:0;
@@ -501,10 +503,22 @@ footer.foot a{color:var(--teal-light)}
 .theme-toggle svg{width:22px;height:22px;stroke:currentColor}
 .theme-toggle:hover{transform:translateY(-2px) rotate(12deg)}
 
-.page-reset{
-  position:absolute;top:46px;right:4px;z-index:250;
+.toggle-labels-btn{
+  position:absolute;top:40px;right:4px;z-index:250;
   width:32px;height:32px;
-  border:none;background:transparent;color:#333333;
+  border:none;background:transparent;color:#757575;
+  cursor:pointer;padding:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s ease, opacity .2s ease;
+}
+.toggle-labels-btn svg{width:22px;height:22px;stroke:currentColor}
+.toggle-labels-btn:hover{transform:translateY(-2px)}
+.toggle-labels-btn[aria-pressed="true"]{opacity:.4}
+
+.page-reset{
+  position:absolute;top:74px;right:4px;z-index:250;
+  width:32px;height:32px;
+  border:none;background:transparent;color:#138808;
   cursor:pointer;padding:0;
   display:flex;align-items:center;justify-content:center;
   transition:transform .2s ease;
@@ -521,6 +535,12 @@ footer.foot a{color:var(--teal-light)}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="4.5"/>
         <path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>
+      </svg>
+    </button>
+    <button id="toggleLabels" class="toggle-labels-btn" title="Hide state names" aria-label="Toggle state name labels" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/>
+        <circle cx="12" cy="10" r="2.5"/>
       </svg>
     </button>
     <button id="pageReset" class="page-reset" title="Reset to nationwide view" aria-label="Reset">
@@ -660,6 +680,14 @@ themeToggleBtn.addEventListener('click', ()=>{
 document.getElementById('pageReset').addEventListener('click', ()=>{
   if(selectedId){ deselectState(); }
   else { window.scrollTo({top:0, behavior:'smooth'}); }
+});
+
+const toggleLabelsBtn = document.getElementById('toggleLabels');
+toggleLabelsBtn.addEventListener('click', ()=>{
+  const svgMap = document.getElementById('india');
+  const nowHidden = svgMap.classList.toggle('labels-hidden');
+  toggleLabelsBtn.setAttribute('aria-pressed', nowHidden ? 'true' : 'false');
+  toggleLabelsBtn.title = nowHidden ? 'Show state names' : 'Hide state names';
 });
 
 const CAT_LABELS = {
