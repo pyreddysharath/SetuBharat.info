@@ -72,14 +72,14 @@ body{
   color:var(--ink);
   transition:background .3s ease, color .3s ease;
   font-family:'Inter','Noto Sans Devanagari','Noto Sans Telugu','Noto Sans Tamil','Noto Sans Kannada','Noto Sans Malayalam','Noto Sans Bengali','Noto Sans Gujarati','Noto Sans Gurmukhi','Noto Sans Oriya','Noto Sans Meetei Mayek','Noto Sans Tibetan','Noto Nastaliq Urdu',sans-serif;
-  min-height:100vh;
 }
 ::selection{background:var(--seal);color:var(--ink)}
 
 /* ---------- Layout ---------- */
 .wrap{
   display:grid;
-  grid-template-columns: minmax(420px, 2.1fr) minmax(360px, 1fr);
+  grid-template-columns: minmax(420px, 1.5fr) minmax(360px, 1fr);
+  align-items:start;
   gap:0;
   min-height:0vh;
 }
@@ -106,7 +106,7 @@ body{
 .map-heading p{margin:0;color:var(--muted);font-size:.92rem;line-height:1.5;max-width:52ch}
 
 .map-shell{
-  width:min(1113px, calc((100vh - 90px) * 1.21));
+  width:min(858px, calc((100vh - 90px) * 0.88));
   margin: 0 auto 0;
   max-width:100%;
   position:relative;
@@ -118,12 +118,12 @@ svg#india{
   transform:rotateX(16deg) rotateZ(0deg);
   transform-origin:center bottom;
   transform-style:preserve-3d;
-  filter:drop-shadow(0 4px 8px rgba(0,0,0,0.05));
+  filter:drop-shadow(0 20px 24px rgba(0,0,0,.7));
   transition:transform .5s cubic-bezier(.2,.8,.3,1);
 }
 svg#india path{
-  stroke:#FFFFFF;
-  stroke-width:1;
+  stroke:#E0E0E0;
+  stroke-width:1.3;
   cursor:pointer;
   transition:filter .18s ease, transform .18s ease;
   transform-origin:center;
@@ -188,6 +188,7 @@ svg#india path.active{animation:pathIn .5s ease forwards, stampIn .35s ease-out}
   min-width:0;
 }
 .detail-col::-webkit-scrollbar{width:10px}
+.detail-col::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
 
 .site-search-wrap{
   position:sticky;top:0;z-index:15;
@@ -253,7 +254,6 @@ svg#india path.active{animation:pathIn .5s ease forwards, stampIn .35s ease-out}
 .site-search-result .meta .title{font-size:.85rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .site-search-result .meta .sub{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .site-search-empty{padding:14px;font-size:.82rem;color:var(--muted);text-align:center}
-.detail-col::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
 
 .empty-state{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -353,7 +353,7 @@ svg#india path.active{animation:pathIn .5s ease forwards, stampIn .35s ease-out}
 }
 
 footer.foot{
-  padding:12px 32px 5px;font-size:.78rem;color:var(--muted);
+  padding:12px 32px 0;font-size:.78rem;color:var(--muted);
   position:sticky;top:0;z-index:100;background:var(--paper);
 }
 footer.foot a{color:var(--teal-light)}
@@ -372,7 +372,7 @@ footer.foot a{color:var(--teal-light)}
   text-decoration:none;cursor:pointer;
   transition:transform .15s ease;
   flex:none;
-  padding:4px;
+  padding:2px;
 }
 .footer-icon .icon-glyph{font-size:1.3rem;line-height:1;display:block}
 .footer-icon:hover{transform:translateY(-2px)}
@@ -414,22 +414,6 @@ footer.foot a{color:var(--teal-light)}
 .info-panel-body p:last-child{margin-bottom:0}
 .info-panel-body a{color:var(--seal)}
 .info-panel-body code{font-family:'IBM Plex Mono',monospace;font-size:.85em;background:var(--paper-dim);padding:1px 5px;border-radius:4px}
-
-/* ---------- Ad slots (Google AdSense) ---------- */
-.ad-slot{
-  border:1.5px dashed var(--line);border-radius:8px;
-  background:var(--paper-dim);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height:100px;padding:14px;margin:20px auto;
-  text-align:center;
-}
-.ad-slot .ad-tag{
-  font-family:'IBM Plex Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;
-  color:var(--muted);margin-bottom:6px;
-}
-.ad-slot-panel{max-width:100%}
-.ad-slot-footer{max-width:920px;min-height:90px}
-.ad-slot-map{max-width:780px}
 
 /* ---------- Feedback section ---------- */
 .feedback-section{
@@ -605,17 +589,6 @@ footer.foot a{color:var(--teal-light)}
   that in.
 ============================================================ -->
 
-<!-- ============================================================
-  AD SLOT: Footer banner
-  1. After AdSense approval, create an ad unit in your dashboard
-     (Ads > By ad unit > Display ads) and copy its data-ad-slot ID.
-  2. Replace ca-pub-XXXXXXXXXXXXXXXX and XXXXXXXXXX below.
-  3. Delete the surrounding placeholder <div class="ad-slot">...
-     wrapper's "ad-tag" span if you don't want the "Advertisement"
-     label (AdSense requires ads to be clearly labeled if your
-     layout could otherwise make them look like content, so it's
-     safest to keep some form of label).
-============================================================ -->
 <footer class="foot">
   <div class="footer-row">
     <span class="footer-copyright">© SetuBharat</span>
@@ -822,37 +795,6 @@ function selectState(id, skipHash){
   }
 }
 
-// ============================================================
-// AD SLOT: In-panel (below the government/citizen links)
-// Uses the same real publisher ID as ADSENSE_CLIENT_ID. The <ins>
-// tag itself is inert markup — it does nothing on its own. It only
-// becomes a real ad request once pushAdSlots() runs AND the AdSense
-// script has actually loaded, which only happens after the visitor
-// accepts cookies (see loadAdsenseScript() / initCookieConsent()).
-// Safe to have this markup present before consent: nothing is
-// requested from Google until both of those have happened.
-// ============================================================
-const AD_SLOT_PANEL_HTML = `
-  <div class="ad-slot ad-slot-panel">
-    <span class="ad-tag">Advertisement</span>
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-format="fluid"
-         data-ad-layout-key="-6t+ed+2i-1n-4w"
-         data-ad-client="ca-pub-1251018920617954"
-         data-ad-slot="1893399650"></ins>
-  </div>
-`;
-function pushAdSlots(){
-  // Queues a request for any not-yet-filled ins.adsbygoogle currently
-  // in the DOM. Harmless to call even before consent/script load —
-  // it just appends to a plain array until the real script (if ever
-  // loaded) reads it.
-  try{
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
-  }catch(e){ /* ad blocker or script unavailable — fail silently */ }
-}
-
 function nationalGroupedHtml(nationalList, dotColor, cardColor){
   const groups = {};
   nationalList.forEach(site=>{ (groups[site.group||'Other'] = groups[site.group||'Other']||[]).push(site); });
@@ -910,12 +852,10 @@ function renderDetail(id){
       <h2 class="state-name section-gap">Pan-India Services</h2>
       ${idHtml}
       ${nationalHtml}
-      ${AD_SLOT_PANEL_HTML}
     </div>
   `;
   document.getElementById('detailCol').scrollTop = 0;
   window.scrollTo({top:0, behavior:'smooth'});
-  pushAdSlots();
 }
 
 function renderDefault(){
@@ -937,10 +877,8 @@ function renderDefault(){
 
       <div class="section-label">National Citizen Services</div>
       ${nationalGroupedHtml(any.national, any.accent, any.mapColor)}
-      ${AD_SLOT_PANEL_HTML}
     </div>
   `;
-  pushAdSlots();
 }
 function deselectState(clearHash){
   Object.values(pathById).forEach(p=>p.classList.remove('active'));
@@ -1030,15 +968,16 @@ function hideCookieNotice(){ cookieNotice.classList.remove('show'); }
 
 function loadAdsenseScript(){
   // Safe to call more than once — it checks first so the script is
-  // never injected twice.
+  // never injected twice. With Auto Ads, simply having this script
+  // loaded is enough — Google automatically finds and inserts ad
+  // placements across the page; no manual <ins> ad units needed.
   if(ADSENSE_CLIENT_ID.includes('XXXXXXXX')) return; // not configured yet
-  if(document.getElementById('adsbygoogle-js')){ pushAdSlots(); return; } // already loaded — just process any new/unfilled slots
+  if(document.getElementById('adsbygoogle-js')) return; // already loaded
   const s = document.createElement('script');
   s.id = 'adsbygoogle-js';
   s.async = true;
   s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`;
   s.crossOrigin = 'anonymous';
-  s.onload = pushAdSlots; // process whatever ad slot(s) are already in the DOM once the script is ready
   document.head.appendChild(s);
 }
 
