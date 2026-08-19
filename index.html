@@ -1070,7 +1070,7 @@ document.getElementById('cookieDecline').addEventListener('click', (e)=>{
 // visible to you, in real time, from every visitor.
 // ============================================================
 const FEEDBACK_KEY = 'feedbackEntries';
-const FEEDBACK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbww9BDzeg2KeMzi9f302GeprQ6cAWgjfXF6CmVJbuLLeOkvVdGcK88qMeahmNeXGImi/exec'; // <-- paste your Apps Script Web App URL here, e.g. 'https://script.google.com/macros/s/AKfycb.../exec'
+const FEEDBACK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwsue4IHBzkL9gQXGSf_KA6GG5gu6PTnMTSgVFBFCVrZRX_ydtyu3_RZyosfWFn2DgzYQ/exec'; // <-- paste your Apps Script Web App URL here, e.g. 'https://script.google.com/macros/s/AKfycb.../exec'
 
 function getFeedbackEntries(){
   try{ return JSON.parse(localStorage.getItem(FEEDBACK_KEY)) || []; }
