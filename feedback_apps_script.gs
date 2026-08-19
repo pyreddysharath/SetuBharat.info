@@ -35,10 +35,10 @@
 function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var date = (e.parameter && e.parameter.date) || Utilities.formatDate(new Date().toISOString(), "Asia/Kolkata", "yyyy-MM-dd HH:mm:ss");
+    var date = (e.parameter && e.parameter.Date) || Utilities.formatDate(new Date(), "Asia/Kolkata", "yyyy-MM-dd HH:mm:ss");
     var website = (e.parameter && e.parameter.Website) || '';
-    var name = (e.parameter && e.parameter.name) || '';
-    var message = (e.parameter && e.parameter.message) || '';
+    var name = (e.parameter && e.parameter.Name) || '';
+    var message = (e.parameter && e.parameter.Message) || '';
     var status = (e.parameter && e.parameter.Status) || '';
 
     sheet.appendRow([date, website, name, message, status]);

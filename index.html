@@ -1156,12 +1156,21 @@ function openFeedbackForm(){
         // stays a CORS "simple request" — Google Apps Script web apps don't
         // handle the pre-flight OPTIONS request that a JSON POST would
         // trigger, so this avoids that entirely.
-        await fetch(FEEDBACK_ENDPOINT, {
+        const res = await fetch(FEEDBACK_ENDPOINT, {
           method: 'POST',
           body: new URLSearchParams(entry)
         });
+        // Apps Script web apps return HTTP 200 even on an internal
+        // script error, so the real success/failure signal is in the
+        // JSON body, not the HTTP status. Logged (not shown to the
+        // visitor) so it doesn't get in the way of their experience,
+        // but is there in devtools if a submission needs debugging.
+        try{
+          const body = await res.json();
+          if(body.status !== 'ok') console.error('Feedback sheet update failed:', body);
+        }catch(parseErr){ console.error('Feedback endpoint returned a non-JSON response — check the Apps Script deployment.'); }
       }
-      catch(err){ /* local copy + download already happened even if this fails */ }
+      catch(err){ console.error('Feedback request failed to reach the endpoint:', err); /* local copy + download already happened even if this fails */ }
     }
 
     showFeedbackConfirmation(); // replace the form with a thank-you message
